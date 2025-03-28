@@ -1,6 +1,6 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED, PLEASE DO NOT EDIT.
 #
-# Generated on 2025-03-28T13:47:01Z by kres d903dae.
+# Generated on 2025-03-28T15:01:01Z by kres d903dae.
 
 # common variables
 
@@ -15,7 +15,7 @@ GOARCH := $(shell uname -m | sed 's/x86_64/amd64/' | sed 's/aarch64/arm64/')
 WITH_DEBUG ?= false
 WITH_RACE ?= false
 REGISTRY ?= ghcr.io
-USERNAME ?=
+USERNAME ?= alongwill
 REGISTRY_AND_USERNAME ?= $(REGISTRY)/$(USERNAME)
 PROTOBUF_GO_VERSION ?= 1.36.5
 GRPC_GO_VERSION ?= 1.5.1

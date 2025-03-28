@@ -2,7 +2,7 @@
 
 # THIS FILE WAS AUTOMATICALLY GENERATED, PLEASE DO NOT EDIT.
 #
-# Generated on 2025-03-28T13:47:01Z by kres d903dae.
+# Generated on 2025-03-28T15:01:01Z by kres d903dae.
 
 ARG TOOLCHAIN
 
@@ -28,12 +28,12 @@ ARG GOEXPERIMENT
 ENV GOEXPERIMENT=${GOEXPERIMENT}
 ENV GOPATH=/go
 ARG DEEPCOPY_VERSION
-RUN --mount=type=cache,target=/root/.cache/go-build,id=/root/.cache/go-build --mount=type=cache,target=/go/pkg,id=/go/pkg go install github.com/siderolabs/deep-copy@${DEEPCOPY_VERSION} \
+RUN --mount=type=cache,target=/root/.cache/go-build,id=t9s/root/.cache/go-build --mount=type=cache,target=/go/pkg,id=t9s/go/pkg go install github.com/siderolabs/deep-copy@${DEEPCOPY_VERSION} \
 	&& mv /go/bin/deep-copy /bin/deep-copy
 ARG GOLANGCILINT_VERSION
-RUN --mount=type=cache,target=/root/.cache/go-build,id=/root/.cache/go-build --mount=type=cache,target=/go/pkg,id=/go/pkg go install github.com/golangci/golangci-lint/cmd/golangci-lint@${GOLANGCILINT_VERSION} \
+RUN --mount=type=cache,target=/root/.cache/go-build,id=t9s/root/.cache/go-build --mount=type=cache,target=/go/pkg,id=t9s/go/pkg go install github.com/golangci/golangci-lint/cmd/golangci-lint@${GOLANGCILINT_VERSION} \
 	&& mv /go/bin/golangci-lint /bin/golangci-lint
-RUN --mount=type=cache,target=/root/.cache/go-build,id=/root/.cache/go-build --mount=type=cache,target=/go/pkg,id=/go/pkg go install golang.org/x/vuln/cmd/govulncheck@latest \
+RUN --mount=type=cache,target=/root/.cache/go-build,id=t9s/root/.cache/go-build --mount=type=cache,target=/go/pkg,id=t9s/go/pkg go install golang.org/x/vuln/cmd/govulncheck@latest \
 	&& mv /go/bin/govulncheck /bin/govulncheck
 ARG GOFUMPT_VERSION
 RUN go install mvdan.cc/gofumpt@${GOFUMPT_VERSION} \
@@ -45,10 +45,10 @@ WORKDIR /src
 COPY go.mod go.mod
 COPY go.sum go.sum
 RUN cd .
-RUN --mount=type=cache,target=/go/pkg,id=/go/pkg go mod download
-RUN --mount=type=cache,target=/go/pkg,id=/go/pkg go mod verify
+RUN --mount=type=cache,target=/go/pkg,id=t9s/go/pkg go mod download
+RUN --mount=type=cache,target=/go/pkg,id=t9s/go/pkg go mod verify
 COPY ./cmd ./cmd
-RUN --mount=type=cache,target=/go/pkg,id=/go/pkg go list -mod=readonly all >/dev/null
+RUN --mount=type=cache,target=/go/pkg,id=t9s/go/pkg go list -mod=readonly all >/dev/null
 
 # runs gofumpt
 FROM base AS lint-gofumpt
@@ -59,12 +59,12 @@ FROM base AS lint-golangci-lint
 WORKDIR /src
 COPY .golangci.yml .
 ENV GOGC=50
-RUN --mount=type=cache,target=/root/.cache/go-build,id=/root/.cache/go-build --mount=type=cache,target=/root/.cache/golangci-lint,id=/root/.cache/golangci-lint,sharing=locked --mount=type=cache,target=/go/pkg,id=/go/pkg golangci-lint run --config .golangci.yml
+RUN --mount=type=cache,target=/root/.cache/go-build,id=t9s/root/.cache/go-build --mount=type=cache,target=/root/.cache/golangci-lint,id=t9s/root/.cache/golangci-lint,sharing=locked --mount=type=cache,target=/go/pkg,id=t9s/go/pkg golangci-lint run --config .golangci.yml
 
 # runs govulncheck
 FROM base AS lint-govulncheck
 WORKDIR /src
-RUN --mount=type=cache,target=/root/.cache/go-build,id=/root/.cache/go-build --mount=type=cache,target=/go/pkg,id=/go/pkg govulncheck ./...
+RUN --mount=type=cache,target=/root/.cache/go-build,id=t9s/root/.cache/go-build --mount=type=cache,target=/go/pkg,id=t9s/go/pkg govulncheck ./...
 
 # builds t9s-linux-amd64
 FROM base AS t9s-linux-amd64-build
@@ -72,19 +72,19 @@ COPY --from=generate / /
 WORKDIR /src/cmd/t9s
 ARG GO_BUILDFLAGS
 ARG GO_LDFLAGS
-RUN --mount=type=cache,target=/root/.cache/go-build,id=/root/.cache/go-build --mount=type=cache,target=/go/pkg,id=/go/pkg go build ${GO_BUILDFLAGS} -ldflags "${GO_LDFLAGS}" -o /t9s-linux-amd64
+RUN --mount=type=cache,target=/root/.cache/go-build,id=t9s/root/.cache/go-build --mount=type=cache,target=/go/pkg,id=t9s/go/pkg go build ${GO_BUILDFLAGS} -ldflags "${GO_LDFLAGS}" -o /t9s-linux-amd64
 
 # runs unit-tests with race detector
 FROM base AS unit-tests-race
 WORKDIR /src
 ARG TESTPKGS
-RUN --mount=type=cache,target=/root/.cache/go-build,id=/root/.cache/go-build --mount=type=cache,target=/go/pkg,id=/go/pkg --mount=type=cache,target=/tmp,id=/tmp CGO_ENABLED=1 go test -v -race -count 1 ${TESTPKGS}
+RUN --mount=type=cache,target=/root/.cache/go-build,id=t9s/root/.cache/go-build --mount=type=cache,target=/go/pkg,id=t9s/go/pkg --mount=type=cache,target=/tmp,id=t9s/tmp CGO_ENABLED=1 go test -v -race -count 1 ${TESTPKGS}
 
 # runs unit-tests
 FROM base AS unit-tests-run
 WORKDIR /src
 ARG TESTPKGS
-RUN --mount=type=cache,target=/root/.cache/go-build,id=/root/.cache/go-build --mount=type=cache,target=/go/pkg,id=/go/pkg --mount=type=cache,target=/tmp,id=/tmp go test -v -covermode=atomic -coverprofile=coverage.txt -coverpkg=${TESTPKGS} -count 1 ${TESTPKGS}
+RUN --mount=type=cache,target=/root/.cache/go-build,id=t9s/root/.cache/go-build --mount=type=cache,target=/go/pkg,id=t9s/go/pkg --mount=type=cache,target=/tmp,id=t9s/tmp go test -v -covermode=atomic -coverprofile=coverage.txt -coverpkg=${TESTPKGS} -count 1 ${TESTPKGS}
 
 FROM scratch AS t9s-linux-amd64
 COPY --from=t9s-linux-amd64-build /t9s-linux-amd64 /t9s-linux-amd64
@@ -102,5 +102,6 @@ ARG TARGETARCH
 COPY --from=t9s t9s-linux-${TARGETARCH} /t9s
 COPY --from=image-fhs / /
 COPY --from=image-ca-certificates / /
+LABEL org.opencontainers.image.source=https://github.com/alongwill/t9s
 ENTRYPOINT ["/t9s"]
 
