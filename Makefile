@@ -1,6 +1,6 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED, PLEASE DO NOT EDIT.
 #
-# Generated on 2025-03-28T15:01:01Z by kres d903dae.
+# Generated on 2025-10-03T20:29:20Z by kres bc281a9.
 
 # common variables
 
@@ -17,21 +17,21 @@ WITH_RACE ?= false
 REGISTRY ?= ghcr.io
 USERNAME ?= alongwill
 REGISTRY_AND_USERNAME ?= $(REGISTRY)/$(USERNAME)
-PROTOBUF_GO_VERSION ?= 1.36.5
+PROTOBUF_GO_VERSION ?= 1.36.9
 GRPC_GO_VERSION ?= 1.5.1
-GRPC_GATEWAY_VERSION ?= 2.26.3
+GRPC_GATEWAY_VERSION ?= 2.27.2
 VTPROTOBUF_VERSION ?= 0.6.0
-GOIMPORTS_VERSION ?= 0.31.0
-GOMOCK_VERSION ?= 0.5.0
-DEEPCOPY_VERSION ?= v0.5.6
-GOLANGCILINT_VERSION ?= v1.64.6
-GOFUMPT_VERSION ?= v0.7.0
-GO_VERSION ?= 1.24.1
+GOIMPORTS_VERSION ?= 0.37.0
+GOMOCK_VERSION ?= 0.6.0
+DEEPCOPY_VERSION ?= v0.5.8
+GOLANGCILINT_VERSION ?= v2.4.0
+GOFUMPT_VERSION ?= v0.9.1
+GO_VERSION ?= 1.25.1
 GO_BUILDFLAGS ?=
 GO_LDFLAGS ?=
 CGO_ENABLED ?= 0
 GOTOOLCHAIN ?= local
-GOEXPERIMENT ?= synctest
+GOEXPERIMENT ?=
 TESTPKGS ?= ./...
 KRES_IMAGE ?= ghcr.io/siderolabs/kres:latest
 CONFORMANCE_IMAGE ?= ghcr.io/siderolabs/conform:latest
@@ -72,7 +72,7 @@ COMMON_ARGS += --build-arg=DEEPCOPY_VERSION="$(DEEPCOPY_VERSION)"
 COMMON_ARGS += --build-arg=GOLANGCILINT_VERSION="$(GOLANGCILINT_VERSION)"
 COMMON_ARGS += --build-arg=GOFUMPT_VERSION="$(GOFUMPT_VERSION)"
 COMMON_ARGS += --build-arg=TESTPKGS="$(TESTPKGS)"
-TOOLCHAIN ?= docker.io/golang:1.24-alpine
+TOOLCHAIN ?= docker.io/golang:1.25-alpine
 
 # help menu
 
@@ -166,6 +166,9 @@ local-%:  ## Builds the specified target defined in the Dockerfile using the loc
 lint-golangci-lint:  ## Runs golangci-lint linter.
 	@$(MAKE) target-$@
 
+lint-golangci-lint-fmt:  ## Runs golangci-lint formatter and tries to fix issues automatically.
+	@$(MAKE) local-$@ DEST=.
+
 lint-gofumpt:  ## Runs gofumpt linter.
 	@$(MAKE) target-$@
 
@@ -192,6 +195,20 @@ unit-tests:  ## Performs unit tests
 unit-tests-race:  ## Performs unit tests with race detection enabled.
 	@$(MAKE) target-$@
 
+.PHONY: $(ARTIFACTS)/t9s-darwin-amd64
+$(ARTIFACTS)/t9s-darwin-amd64:
+	@$(MAKE) local-t9s-darwin-amd64 DEST=$(ARTIFACTS)
+
+.PHONY: t9s-darwin-amd64
+t9s-darwin-amd64: $(ARTIFACTS)/t9s-darwin-amd64  ## Builds executable for t9s-darwin-amd64.
+
+.PHONY: $(ARTIFACTS)/t9s-darwin-arm64
+$(ARTIFACTS)/t9s-darwin-arm64:
+	@$(MAKE) local-t9s-darwin-arm64 DEST=$(ARTIFACTS)
+
+.PHONY: t9s-darwin-arm64
+t9s-darwin-arm64: $(ARTIFACTS)/t9s-darwin-arm64  ## Builds executable for t9s-darwin-arm64.
+
 .PHONY: $(ARTIFACTS)/t9s-linux-amd64
 $(ARTIFACTS)/t9s-linux-amd64:
 	@$(MAKE) local-t9s-linux-amd64 DEST=$(ARTIFACTS)
@@ -199,11 +216,25 @@ $(ARTIFACTS)/t9s-linux-amd64:
 .PHONY: t9s-linux-amd64
 t9s-linux-amd64: $(ARTIFACTS)/t9s-linux-amd64  ## Builds executable for t9s-linux-amd64.
 
+.PHONY: $(ARTIFACTS)/t9s-linux-arm64
+$(ARTIFACTS)/t9s-linux-arm64:
+	@$(MAKE) local-t9s-linux-arm64 DEST=$(ARTIFACTS)
+
+.PHONY: t9s-linux-arm64
+t9s-linux-arm64: $(ARTIFACTS)/t9s-linux-arm64  ## Builds executable for t9s-linux-arm64.
+
 .PHONY: t9s
-t9s: t9s-linux-amd64  ## Builds executables for t9s.
+t9s: t9s-darwin-amd64 t9s-darwin-arm64 t9s-linux-amd64 t9s-linux-arm64  ## Builds executables for t9s.
+
+.PHONY: lint-markdown
+lint-markdown:  ## Runs markdownlint.
+	@$(MAKE) target-$@
 
 .PHONY: lint
-lint: lint-golangci-lint lint-gofumpt lint-govulncheck  ## Run all linters for the project.
+lint: lint-golangci-lint lint-gofumpt lint-govulncheck lint-markdown  ## Run all linters for the project.
+
+.PHONY: lint-fmt
+lint-fmt: lint-golangci-lint-fmt  ## Run all linter formatters and fix up the source tree.
 
 .PHONY: image-t9s
 image-t9s:  ## Builds image for t9s.

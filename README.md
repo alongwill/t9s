@@ -9,7 +9,7 @@ Aspirational version of `k9s` for Talos Linux and even Omni.
 To run the app locally:
 
 ```sh
-go run ./....
+go run ./...
 ```
 
 To build it:
@@ -22,4 +22,10 @@ To update `go.mod` with latest modules:
 
 ```sh
 go mod tidy
+```
+
+## Building
+
+```sh
+make t9s-darwin-arm64
 ```

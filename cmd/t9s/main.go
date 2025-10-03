@@ -2,13 +2,14 @@ package main
 
 import (
 	"context"
+	"log"
+	"os"
+	"time"
+
 	"github.com/cosi-project/runtime/pkg/safe"
 	"github.com/siderolabs/talos/pkg/machinery/resources/block"
 	"github.com/siderolabs/talos/pkg/machinery/resources/cluster"
 	"google.golang.org/protobuf/types/known/emptypb"
-	"log"
-	"os"
-	"time"
 
 	"github.com/siderolabs/talos/pkg/machinery/client"
 )
@@ -41,7 +42,8 @@ func run() error {
 
 	// TARGET MULTIPLE NODES AT THE SAME TIME - MULTIPLEXING
 
-	ctx = client.WithNodes(ctx, "172.20.0.3", "172.20.0.4", "172.20.0.5")
+	// ctx = client.WithNodes(ctx, "172.20.0.3", "172.20.0.4", "172.20.0.5")
+	ctx = client.WithNodes(ctx, "10.10.8.106")
 
 	// TALOSCTL VERSION:
 
@@ -73,7 +75,7 @@ func run() error {
 	cosiState := cli.COSI
 
 	// COSI state API calls do not support multiplexing (.WithNodes), so we target a single node.
-	ctx = client.WithNode(ctx, "172.20.0.3")
+	ctx = client.WithNode(ctx, "10.10.8.106")
 
 	// TALOSCTL GET MEMBERS
 
